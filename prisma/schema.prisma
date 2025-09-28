@@ -1,0 +1,243 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model SiteVisit {
+  id              String   @id @default(cuid())
+  customerId      String
+  leadDate        DateTime
+  customerName    String
+  phoneNumber     String
+  hasWhatsApp     Boolean  @default(false)
+  hasWhatsAppNumber Boolean @default(false)
+  whatsappNumber  String?
+  status          Status   @default(PENDING)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relationships
+  location        Location?
+  mediaUploads    MediaUpload[]
+  additionalCharges AdditionalCharges?
+  serviceDetails  ServiceDetails?
+  quotation       Quotation?
+
+  @@map("site_visits")
+}
+
+model Location {
+  id        String @id @default(cuid())
+  district  String
+  city      String
+  address   String?
+  latitude  Float?
+  longitude Float?
+  
+  // Relationships
+  siteVisitId String  @unique
+  siteVisit   SiteVisit @relation(fields: [siteVisitId], references: [id], onDelete: Cascade)
+
+  @@map("locations")
+}
+
+model MediaUpload {
+  id           String      @id @default(cuid())
+  type         MediaType
+  fileName     String
+  filePath     String
+  fileSize     Int
+  mimeType     String
+  uploadedAt   DateTime    @default(now())
+  
+  // Relationships
+  siteVisitId String
+  siteVisit   SiteVisit @relation(fields: [siteVisitId], references: [id], onDelete: Cascade)
+
+  @@map("media_uploads")
+}
+
+model AdditionalCharges {
+  id               String @id @default(cuid())
+  hasRemovals      Boolean @default(false)
+  removalCharge    Float?
+  hasAdditionalLabor Boolean @default(false)
+  additionalLaborCharge Float?
+  
+  // Relationships
+  siteVisitId String  @unique
+  siteVisit   SiteVisit @relation(fields: [siteVisitId], references: [id], onDelete: Cascade)
+
+  @@map("additional_charges")
+}
+
+model ServiceDetails {
+  id           String       @id @default(cuid())
+  serviceType  ServiceType
+  
+  // Relationships
+  siteVisitId  String       @unique
+  siteVisit    SiteVisit    @relation(fields: [siteVisitId], references: [id], onDelete: Cascade)
+  ceilingDetails CeilingDetails?
+  guttersDetails GuttersDetails?
+  roofDetails   RoofDetails?
+
+  @@map("service_details")
+}
+
+model CeilingDetails {
+  id               String @id @default(cuid())
+  ceilingType      CeilingType
+  hasMacfoil       Boolean @default(false)
+  pricePerSqFt     Float
+  quotationNumber  String?
+  
+  // Relationships
+  serviceDetailsId String  @unique
+  serviceDetails  ServiceDetails @relation(fields: [serviceDetailsId], references: [id], onDelete: Cascade)
+  ceilingAreas    CeilingArea[]
+
+  @@map("ceiling_details")
+}
+
+model CeilingArea {
+  id        String @id @default(cuid())
+  length    String  // stored as string like "10' 0\""
+  width     String  // stored as string like "10' 0\""
+  areaSqFt  Float   // calculated area in square feet
+  
+  // Relationships
+  ceilingDetailsId String
+  ceilingDetails   CeilingDetails @relation(fields: [ceilingDetailsId], references: [id], onDelete: Cascade)
+
+  @@map("ceiling_areas")
+}
+
+model GuttersDetails {
+  id                    String @id @default(cuid())
+  guttersValanceB       String  // measurement string like "5' + 6' + 3'"
+  bFlashingValanceB     String
+  gutters               String
+  valanceB              String
+  bFlashing             String
+  dPipes                String
+  nozzelsCount          Int?
+  nozzelsDontWant       Boolean @default(false)
+  endCapsCount          Int?
+  endCapsDontWant       Boolean @default(false)
+  chainPacketsCount     Int?
+  chainPacketsDontWant  Boolean @default(false)
+  wallFSize             String? // "9" or "12"
+  wallFMeasurements     String?
+  blindWallFlashingSize  String? // "9" or "12"
+  blindWallFlashingMeasurements String?
+  ridgeCover            String
+  ratGuard              String
+  customDesignNote      String?
+  quotationNumber       String?
+  
+  // Relationships
+  serviceDetailsId String  @unique
+  serviceDetails  ServiceDetails @relation(fields: [serviceDetailsId], references: [id], onDelete: Cascade)
+
+  @@map("gutters_details")
+}
+
+model RoofDetails {
+  id               String      @id @default(cuid())
+  roofType         RoofType
+  structureType    StructureType?
+  finishType       FinishType?
+  material         RoofMaterial?
+  color            RoofColor?
+  subOption        String?
+  quotationNumber  String?
+  
+  // Relationships
+  serviceDetailsId String        @unique
+  serviceDetails  ServiceDetails @relation(fields: [serviceDetailsId], references: [id], onDelete: Cascade)
+
+  @@map("roof_details")
+}
+
+model Quotation {
+  id           String  @id @default(cuid())
+  quotationNumber String
+  fileName     String
+  filePath     String
+  fileSize     Int
+  mimeType     String
+  uploadedAt   DateTime @default(now())
+  
+  // Relationships
+  siteVisitId String  @unique
+  siteVisit   SiteVisit @relation(fields: [siteVisitId], references: [id], onDelete: Cascade)
+
+  @@map("quotations")
+}
+
+// Enums
+enum Status {
+  PENDING
+  RUNNING
+  COMPLETE
+  CANCEL
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+enum ServiceType {
+  CEILING
+  GUTTERS
+  ROOF
+}
+
+enum CeilingType {
+  ELTORO
+  PVC
+  PANEL_FLAT
+  PANEL_BOX
+}
+
+enum RoofType {
+  NEW
+  REPAIR
+}
+
+enum StructureType {
+  WOOD
+  STEEL
+}
+
+enum FinishType {
+  NORMAL
+  FINISHING
+}
+
+enum RoofMaterial {
+  ASBESTOS
+  ASBESTOS_COLOR
+  TILE
+  AMANO_NORMAL
+  AMANO_CURVE
+  AMANO_TILE
+  UPVC
+  TRANSPARENT
+}
+
+enum RoofColor {
+  TILE_RED
+  GREEN
+  BROWN
+  ASH
+}
