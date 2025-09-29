@@ -67,7 +67,8 @@ export default function MediaUpload({
   }, [drawingMode, drawingCanvas]);
 
   // Camera functions
-  const startCamera = async () => {
+  const startCamera = async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'environment' } 
@@ -82,7 +83,8 @@ export default function MediaUpload({
     }
   };
 
-  const stopCamera = () => {
+  const stopCamera = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (videoRef.current?.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
       stream.getTracks().forEach(track => track.stop());
@@ -91,7 +93,8 @@ export default function MediaUpload({
     }
   };
 
-  const capturePhoto = () => {
+  const capturePhoto = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (videoRef.current && canvasRef.current) {
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
@@ -116,7 +119,8 @@ export default function MediaUpload({
   };
 
   // Video recording functions
-  const startRecording = async () => {
+  const startRecording = async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'environment' },
@@ -178,7 +182,8 @@ export default function MediaUpload({
     }
   };
 
-  const stopRecording = () => {
+  const stopRecording = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (mediaRecorderRef.current && recording) {
       mediaRecorderRef.current.stop();
       setRecording(false);
@@ -193,16 +198,19 @@ export default function MediaUpload({
   };
 
   // Drawing functions
-  const startDrawing = () => {
+  const startDrawing = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     setDrawingMode(true);
   };
 
-  const stopDrawing = () => {
+  const stopDrawing = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     setDrawingMode(false);
     setIsDrawing(false);
   };
 
   const handleDrawingStart = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
     if (!drawingContext || !drawingCanvas) return;
     
     setIsDrawing(true);
@@ -215,6 +223,7 @@ export default function MediaUpload({
   };
 
   const handleDrawingMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
     if (!isDrawing || !drawingContext || !drawingCanvas) return;
     
     const rect = drawingCanvas.getBoundingClientRect();
@@ -225,13 +234,15 @@ export default function MediaUpload({
     drawingContext.stroke();
   };
 
-  const handleDrawingEnd = () => {
+  const handleDrawingEnd = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
     if (!drawingContext) return;
     drawingContext.closePath();
     setIsDrawing(false);
   };
 
-  const saveDrawing = () => {
+  const saveDrawing = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (drawingCanvas) {
       const imageData = drawingCanvas.toDataURL('image/png');
       const newDrawing: MediaFile = {
@@ -251,13 +262,15 @@ export default function MediaUpload({
     }
   };
 
-  const clearDrawing = () => {
+  const clearDrawing = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (drawingContext && drawingCanvas) {
       drawingContext.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
     }
   };
 
-  const removeMedia = (type: 'image' | 'drawing' | 'video', id: string) => {
+  const removeMedia = (type: 'image' | 'drawing' | 'video', id: string, e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (type === 'image') {
       onImagesChange(images.filter(img => img.id !== id));
     } else if (type === 'drawing') {
@@ -267,7 +280,8 @@ export default function MediaUpload({
     }
   };
 
-  const downloadMedia = (media: MediaFile) => {
+  const downloadMedia = (media: MediaFile, e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     const link = document.createElement('a');
     link.href = media.data;
     link.download = media.name;
@@ -291,35 +305,39 @@ export default function MediaUpload({
           {/* Camera Controls */}
           <div className="flex flex-wrap gap-2">
             <Button
-              onClick={cameraActive ? stopCamera : startCamera}
+              onClick={(e) => cameraActive ? stopCamera(e) : startCamera(e)}
               variant={cameraActive ? "destructive" : "default"}
               disabled={recording}
+              type="button"
             >
               {cameraActive ? "Stop Camera" : "Start Camera"}
             </Button>
             
             <Button
-              onClick={capturePhoto}
+              onClick={(e) => capturePhoto(e)}
               disabled={!cameraActive || recording || images.length >= maxImages}
               variant="outline"
+              type="button"
             >
               <Camera className="h-4 w-4 mr-2" />
               Capture Photo ({images.length}/{maxImages})
             </Button>
             
             <Button
-              onClick={recording ? stopRecording : startRecording}
+              onClick={(e) => recording ? stopRecording(e) : startRecording(e)}
               disabled={!cameraActive || videos.length >= maxVideos}
               variant={recording ? "destructive" : "outline"}
+              type="button"
             >
               <Video className="h-4 w-4 mr-2" />
               {recording ? `Stop Recording (${recordingTime}s)` : `Record Video (${videos.length}/${maxVideos})`}
             </Button>
             
             <Button
-              onClick={drawingMode ? stopDrawing : startDrawing}
+              onClick={(e) => drawingMode ? stopDrawing(e) : startDrawing(e)}
               variant={drawingMode ? "destructive" : "outline"}
               disabled={drawings.length >= maxDrawings}
+              type="button"
             >
               <Edit className="h-4 w-4 mr-2" />
               {drawingMode ? "Stop Drawing" : `Start Drawing (${drawings.length}/${maxDrawings})`}
@@ -359,11 +377,11 @@ export default function MediaUpload({
                 style={{ touchAction: 'none' }}
               />
               <div className="flex gap-2">
-                <Button onClick={saveDrawing} variant="outline">
+                <Button onClick={(e) => saveDrawing(e)} variant="outline" type="button">
                   <Plus className="h-4 w-4 mr-2" />
                   Save Drawing
                 </Button>
-                <Button onClick={clearDrawing} variant="outline">
+                <Button onClick={(e) => clearDrawing(e)} variant="outline" type="button">
                   <Trash2 className="h-4 w-4 mr-2" />
                   Clear
                 </Button>
@@ -398,16 +416,18 @@ export default function MediaUpload({
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => downloadMedia(image)}
+                      onClick={(e) => downloadMedia(image, e)}
                       className="h-6 w-6 p-0"
+                      type="button"
                     >
                       <Download className="h-3 w-3" />
                     </Button>
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => removeMedia('image', image.id)}
+                      onClick={(e) => removeMedia('image', image.id, e)}
                       className="h-6 w-6 p-0"
+                      type="button"
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>
@@ -444,16 +464,18 @@ export default function MediaUpload({
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => downloadMedia(drawing)}
+                      onClick={(e) => downloadMedia(drawing, e)}
                       className="h-6 w-6 p-0"
+                      type="button"
                     >
                       <Download className="h-3 w-3" />
                     </Button>
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => removeMedia('drawing', drawing.id)}
+                      onClick={(e) => removeMedia('drawing', drawing.id, e)}
                       className="h-6 w-6 p-0"
+                      type="button"
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>
@@ -507,16 +529,18 @@ export default function MediaUpload({
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => downloadMedia(video)}
+                      onClick={(e) => downloadMedia(video, e)}
                       className="h-6 w-6 p-0"
+                      type="button"
                     >
                       <Download className="h-3 w-3" />
                     </Button>
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => removeMedia('video', video.id)}
+                      onClick={(e) => removeMedia('video', video.id, e)}
                       className="h-6 w-6 p-0"
+                      type="button"
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>
