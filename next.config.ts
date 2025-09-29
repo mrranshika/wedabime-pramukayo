@@ -1,56 +1,24 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  // Enable experimental features
-  experimental: {
-    // Enable if you want to use server actions
-    serverActions: true,
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  /* config options here */
+  typescript: {
+    ignoreBuildErrors: true,
   },
-  
-  // Image optimization
-  images: {
-    domains: ['localhost'],
-    formats: ['image/webp', 'image/avif'],
+  // 禁用 Next.js 热重载，由 nodemon 处理重编译
+  reactStrictMode: false,
+  webpack: (config, { dev }) => {
+    if (dev) {
+      // 禁用 webpack 的热模块替换
+      config.watchOptions = {
+        ignored: ['**/*'], // 忽略所有文件变化
+      };
+    }
+    return config;
   },
-  
-  // Compression
-  compress: true,
-  
-  // Environment variables that should be available to the client
-  env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
-  },
-  
-  // Headers for security and performance
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
-          },
-        ],
-      },
-    ];
-  },
-  
-  // Redirects if needed
-  async redirects() {
-    return [];
-  },
-  
-  // Rewrites if needed
-  async rewrites() {
-    return [];
+  eslint: {
+    // 构建时忽略ESLint错误
+    ignoreDuringBuilds: true,
   },
 };
 

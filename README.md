@@ -1,112 +1,141 @@
-# Wedabime Pramukayo - Site Visitor Application
+# 🚀 Welcome to Z.ai Code Scaffold
 
-A comprehensive site visitor application for Wedabime Pramukayo with Google Sheets integration.
+A modern, production-ready web application scaffold powered by cutting-edge technologies, designed to accelerate your development with [Z.ai](https://chat.z.ai)'s AI-powered coding assistance.
 
-## 🚀 Deployment Guide
+## ✨ Technology Stack
 
-### Prerequisites
+This scaffold provides a robust foundation built with:
 
-- Google Account (for Google Sheets)
-- GitHub Account (for Vercel deployment)
-- Node.js 18+ installed locally
+### 🎯 Core Framework
+- **⚡ Next.js 15** - The React framework for production with App Router
+- **📘 TypeScript 5** - Type-safe JavaScript for better developer experience
+- **🎨 Tailwind CSS 4** - Utility-first CSS framework for rapid UI development
 
-### Step 1: Google Sheets Setup
+### 🧩 UI Components & Styling
+- **🧩 shadcn/ui** - High-quality, accessible components built on Radix UI
+- **🎯 Lucide React** - Beautiful & consistent icon library
+- **🌈 Framer Motion** - Production-ready motion library for React
+- **🎨 Next Themes** - Perfect dark mode in 2 lines of code
 
-1. Create a new Google Sheet at [sheets.google.com](https://sheets.google.com)
-2. Name it "Wedabime Pramukayo - Site Visits"
-3. Set up column headers (see `COLUMNS.md` for complete list)
-4. Create Google Apps Script with the code in `google-apps-script.js`
-5. Deploy as Web App with "Anyone" access
-6. Copy the Web App URL
+### 📋 Forms & Validation
+- **🎣 React Hook Form** - Performant forms with easy validation
+- **✅ Zod** - TypeScript-first schema validation
 
-### Step 2: Environment Setup
+### 🔄 State Management & Data Fetching
+- **🐻 Zustand** - Simple, scalable state management
+- **🔄 TanStack Query** - Powerful data synchronization for React
+- **🌐 Axios** - Promise-based HTTP client
 
-1. Fork this repository to your GitHub account
-2. Clone it locally:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/wedabime-pramukayo.git
-   cd wedabime-pramukayo
-   ```
+### 🗄️ Database & Backend
+- **🗄️ Prisma** - Next-generation Node.js and TypeScript ORM
+- **🔐 NextAuth.js** - Complete open-source authentication solution
 
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
+### 🎨 Advanced UI Features
+- **📊 TanStack Table** - Headless UI for building tables and datagrids
+- **🖱️ DND Kit** - Modern drag and drop toolkit for React
+- **📊 Recharts** - Redefined chart library built with React and D3
+- **🖼️ Sharp** - High performance image processing
 
-4. Create `.env.local` file:
-   ```bash
-   NEXT_PUBLIC_GOOGLE_SHEETS_URL=your_google_apps_script_url
-   DATABASE_URL="file:./dev.db"
-   ```
+### 🌍 Internationalization & Utilities
+- **🌍 Next Intl** - Internationalization library for Next.js
+- **📅 Date-fns** - Modern JavaScript date utility library
+- **🪝 ReactUse** - Collection of essential React hooks for modern development
 
-### Step 3: Vercel Deployment
+## 🎯 Why This Scaffold?
 
-1. Push to GitHub:
-   ```bash
-   git add .
-   git commit -m "Initial setup"
-   git push origin main
-   ```
+- **🏎️ Fast Development** - Pre-configured tooling and best practices
+- **🎨 Beautiful UI** - Complete shadcn/ui component library with advanced interactions
+- **🔒 Type Safety** - Full TypeScript configuration with Zod validation
+- **📱 Responsive** - Mobile-first design principles with smooth animations
+- **🗄️ Database Ready** - Prisma ORM configured for rapid backend development
+- **🔐 Auth Included** - NextAuth.js for secure authentication flows
+- **📊 Data Visualization** - Charts, tables, and drag-and-drop functionality
+- **🌍 i18n Ready** - Multi-language support with Next Intl
+- **🚀 Production Ready** - Optimized build and deployment settings
+- **🤖 AI-Friendly** - Structured codebase perfect for AI assistance
 
-2. Deploy to Vercel:
-   - Go to [vercel.com](https://vercel.com)
-   - Import your GitHub repository
-   - Add environment variable:
-     - `NEXT_PUBLIC_GOOGLE_SHEETS_URL`: Your Google Apps Script URL
-   - Deploy
+## 🚀 Quick Start
 
-### Step 4: Testing
+```bash
+# Install dependencies
+npm install
 
-1. Fill out the form on your deployed site
-2. Check your Google Sheet for new entries
-3. Verify all data is correctly saved
+# Start development server
+npm run dev
 
-## 📋 Features
+# Build for production
+npm run build
 
-- ✅ Customer information management
-- ✅ WhatsApp integration with conditional logic
-- ✅ Location tracking with Google Maps
-- ✅ Media upload (images & videos)
-- ✅ Service selection (Roof, Ceiling, Gutters)
-- ✅ Complex calculation systems
-- ✅ Google Sheets integration
-- ✅ Real-time form validation
-- ✅ Responsive design
+# Start production server
+npm start
+```
 
-## 🔧 Technology Stack
+Open [http://localhost:3000](http://localhost:3000) to see your application running.
 
-- **Frontend**: Next.js 15, React, TypeScript
-- **UI Components**: shadcn/ui, Tailwind CSS
-- **Backend**: Next.js API Routes
-- **Database**: SQLite (local), Google Sheets (production)
-- **Deployment**: Vercel
-- **Authentication**: Google Apps Script
+## 🤖 Powered by Z.ai
 
-## 📝 Environment Variables
+This scaffold is optimized for use with [Z.ai](https://chat.z.ai) - your AI assistant for:
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `NEXT_PUBLIC_GOOGLE_SHEETS_URL` | Google Apps Script URL | Yes |
-| `DATABASE_URL` | Local database URL | No |
+- **💻 Code Generation** - Generate components, pages, and features instantly
+- **🎨 UI Development** - Create beautiful interfaces with AI assistance  
+- **🔧 Bug Fixing** - Identify and resolve issues with intelligent suggestions
+- **📝 Documentation** - Auto-generate comprehensive documentation
+- **🚀 Optimization** - Performance improvements and best practices
 
-## 🤝 Contributing
+Ready to build something amazing? Start chatting with Z.ai at [chat.z.ai](https://chat.z.ai) and experience the future of AI-powered development!
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+## 📁 Project Structure
 
-## 📄 License
+```
+src/
+├── app/                 # Next.js App Router pages
+├── components/          # Reusable React components
+│   └── ui/             # shadcn/ui components
+├── hooks/              # Custom React hooks
+└── lib/                # Utility functions and configurations
+```
 
-This project is licensed under the MIT License.
+## 🎨 Available Features & Components
 
-## 🆘 Support
+This scaffold includes a comprehensive set of modern web development tools:
 
-If you encounter any issues:
-1. Check the browser console for errors
-2. Verify your Google Apps Script deployment
-3. Ensure environment variables are correctly set
-4. Check Vercel deployment logs
+### 🧩 UI Components (shadcn/ui)
+- **Layout**: Card, Separator, Aspect Ratio, Resizable Panels
+- **Forms**: Input, Textarea, Select, Checkbox, Radio Group, Switch
+- **Feedback**: Alert, Toast (Sonner), Progress, Skeleton
+- **Navigation**: Breadcrumb, Menubar, Navigation Menu, Pagination
+- **Overlay**: Dialog, Sheet, Popover, Tooltip, Hover Card
+- **Data Display**: Badge, Avatar, Calendar
 
-For additional support, please create an issue in the GitHub repository.
+### 📊 Advanced Data Features
+- **Tables**: Powerful data tables with sorting, filtering, pagination (TanStack Table)
+- **Charts**: Beautiful visualizations with Recharts
+- **Forms**: Type-safe forms with React Hook Form + Zod validation
+
+### 🎨 Interactive Features
+- **Animations**: Smooth micro-interactions with Framer Motion
+- **Drag & Drop**: Modern drag-and-drop functionality with DND Kit
+- **Theme Switching**: Built-in dark/light mode support
+
+### 🔐 Backend Integration
+- **Authentication**: Ready-to-use auth flows with NextAuth.js
+- **Database**: Type-safe database operations with Prisma
+- **API Client**: HTTP requests with Axios + TanStack Query
+- **State Management**: Simple and scalable with Zustand
+
+### 🌍 Production Features
+- **Internationalization**: Multi-language support with Next Intl
+- **Image Optimization**: Automatic image processing with Sharp
+- **Type Safety**: End-to-end TypeScript with Zod validation
+- **Essential Hooks**: 100+ useful React hooks with ReactUse for common patterns
+
+## 🤝 Get Started with Z.ai
+
+1. **Clone this scaffold** to jumpstart your project
+2. **Visit [chat.z.ai](https://chat.z.ai)** to access your AI coding assistant
+3. **Start building** with intelligent code generation and assistance
+4. **Deploy with confidence** using the production-ready setup
+
+---
+
+Built with ❤️ for the developer community. Supercharged by [Z.ai](https://chat.z.ai) 🚀
