@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { CalendarDays, MapPin, Upload, DollarSign, Home, Users, FileText, Camera, Video, Phone, MessageCircle, Plus, Trash2, Calculator } from 'lucide-react';
+import MediaUpload from '@/components/MediaUpload';
 
 interface CustomerData {
   customerId: string;
@@ -34,6 +35,18 @@ interface CustomerData {
   ceilingData?: any;
   guttersData?: any;
   roofData?: any;
+  images?: MediaFile[];
+  drawings?: MediaFile[];
+  videos?: MediaFile[];
+}
+
+interface MediaFile {
+  id: string;
+  type: 'image' | 'drawing' | 'video';
+  data: string;
+  name: string;
+  timestamp: string;
+  size?: number;
 }
 
 interface Area {
@@ -60,6 +73,8 @@ export default function SiteVisitorForm() {
   const [hasWhatsApp, setHasWhatsApp] = useState<boolean>(false);
   const [hasWhatsAppNumber, setHasWhatsAppNumber] = useState<string>('');
   const [whatsappNumber, setWhatsappNumber] = useState<string>('');
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [editingId, setEditingId] = useState<string>('');
 
   // Location Information
   const [district, setDistrict] = useState<string>('');
@@ -106,7 +121,12 @@ export default function SiteVisitorForm() {
   const [color, setColor] = useState<string>('');
   const [subOption, setSubOption] = useState<string>('');
 
-  // Generate customer IDs
+  // Media State
+  const [images, setImages] = useState<MediaFile[]>([]);
+  const [drawings, setDrawings] = useState<MediaFile[]>([]);
+  const [videos, setVideos] = useState<MediaFile[]>([]);
+
+  // Generate customer IDs and check for editing mode
   useEffect(() => {
     const generateCustomerIds = () => {
       const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -124,12 +144,106 @@ export default function SiteVisitorForm() {
           }
         }
       }
-
-      setCustomerIds(ids);
-    };
+    }
 
     generateCustomerIds();
+    
+    // Check for editing mode
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get('edit');
+    
+    if (editId) {
+      loadSiteVisitForEditing(editId);
+    } else {
+      // Generate new customer ID for new entries
+      generateNewCustomerID();
+    }
   }, []);
+
+  const generateNewCustomerID = async () => {
+    try {
+      const response = await fetch('/api/customer-id');
+      const result = await response.json();
+      
+      if (result.success) {
+        setCustomerId(result.nextCustomerID);
+      }
+    } catch (error) {
+      console.error('Error generating customer ID:', error);
+      // Fallback to a simple ID
+      setCustomerId('A-000a01');
+    }
+  };
+
+  const loadSiteVisitForEditing = async (id: string) => {
+    try {
+      setIsEditing(true);
+      setEditingId(id);
+      
+      const response = await fetch(`/api/site-visits?action=getById&id=${id}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        const visit = result.data;
+        
+        // Populate all form fields
+        setCustomerId(visit.customerId);
+        setLeadDate(visit.leadDate);
+        setCustomerName(visit.customerName);
+        setPhoneNumber(visit.phoneNumber);
+        setHasWhatsApp(visit.hasWhatsApp);
+        setDistrict(visit.district);
+        setCity(visit.city);
+        setAddress(visit.address || '');
+        setHasRemovals(visit.hasRemovals || false);
+        setRemovalCharge(visit.removalCharge || '');
+        setHasAdditionalLabor(visit.hasAdditionalLabor || false);
+        setAdditionalLaborCharge(visit.additionalLaborCharge || '');
+        setStatus(visit.status);
+        setSelectedService(visit.selectedService);
+        
+        // Load service-specific data
+        if (visit.ceilingData) {
+          setCeilingType(visit.ceilingData.type);
+          setPricePerSqFt(visit.ceilingData.pricePerSqFt || 180);
+          setAreas(visit.ceilingData.areas || [{ length: '', width: '', area: 0 }]);
+        }
+        
+        if (visit.guttersData) {
+          setGuttersMeasurements(visit.guttersData.measurements || {});
+          setNozzelsDontWant(!visit.guttersData.items?.nozzels);
+          setNozzelsCount(visit.guttersData.items?.nozzels || '');
+          setEndCapsDontWant(!visit.guttersData.items?.endCaps);
+          setEndCapsCount(visit.guttersData.items?.endCaps || '');
+          setChainPacketsDontWant(!visit.guttersData.items?.chainPackets);
+          setChainPacketsCount(visit.guttersData.items?.chainPackets || '');
+          setWallFSize(visit.guttersData.wallF?.size || '');
+          setWallFMeasurements(visit.guttersData.wallF?.measurements || '');
+          setBlindWallSize(visit.guttersData.blindWallFlashing?.size || '');
+          setBlindWallMeasurements(visit.guttersData.blindWallFlashing?.measurements || '');
+          setCustomDesignNote(visit.guttersData.customDesignNote || '');
+        }
+        
+        if (visit.roofData) {
+          setRoofType(visit.roofData.roofType);
+          setStructureType(visit.roofData.structureType);
+          setFinishType(visit.roofData.finishType);
+          setMaterial(visit.roofData.material);
+          setColor(visit.roofData.color);
+          setSubOption(visit.roofData.subOption);
+        }
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      console.error('Error loading site visit for editing:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load site visit for editing",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Update day of week when date changes
   useEffect(() => {
@@ -248,6 +362,9 @@ export default function SiteVisitorForm() {
         additionalLaborCharge: hasAdditionalLabor ? additionalLaborCharge : undefined,
         status,
         selectedService,
+        images,
+        drawings,
+        videos,
       };
 
       // Add service-specific data
@@ -293,21 +410,100 @@ export default function SiteVisitorForm() {
       }
 
       // Send data to Google Sheets via API
-      const response = await fetch('/api/google-sheets', {
+      const response = await fetch('/api/site-visits', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          action: isEditing ? 'update' : 'create',
+          data: isEditing ? { ...formData, id: editingId } : formData
+        }),
       });
 
       const result = await response.json();
 
       if (result.success) {
+        // Reserve customer ID if creating new entry
+        if (!isEditing) {
+          try {
+            await fetch('/api/customer-id', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'reserve', customerId })
+            });
+          } catch (error) {
+            console.error('Failed to reserve customer ID:', error);
+          }
+        }
+        
         toast({
           title: "Success",
-          description: "Site visit form submitted successfully!",
+          description: isEditing ? "Site visit updated successfully!" : "Site visit submitted successfully!",
         });
+
+        // Redirect to dashboard after successful submission
+        setTimeout(() => {
+          window.location.href = '/dashboard';
+        }, 1500);
+
+        // Reset form if creating new entry
+        if (!isEditing) {
+          // Reset form fields
+          setLeadDate('');
+          setCustomerName('');
+          setPhoneNumber('');
+          setHasWhatsApp(false);
+          setHasWhatsAppNumber('');
+          setWhatsappNumber('');
+          setDistrict('');
+          setCity('');
+          setAddress('');
+          setHasRemovals(false);
+          setRemovalCharge('');
+          setHasAdditionalLabor(false);
+          setAdditionalLaborCharge('');
+          setStatus('pending');
+          setSelectedService('');
+          setCeilingType('');
+          setPricePerSqFt(180);
+          setAreas([{ length: '', width: '', area: 0 }]);
+          setGuttersMeasurements({
+            guttersValanceB: '',
+            bFlashingValanceB: '',
+            gutters: '',
+            valanceB: '',
+            bFlashing: '',
+            dPipes: '',
+            ridgeCover: '',
+            ratGuard: '',
+          });
+          setNozzelsDontWant(false);
+          setNozzelsCount('');
+          setEndCapsDontWant(false);
+          setEndCapsCount('');
+          setChainPacketsDontWant(false);
+          setChainPacketsCount('');
+          setWallFSize('');
+          setWallFMeasurements('');
+          setBlindWallSize('');
+          setBlindWallMeasurements('');
+          setCustomDesignNote('');
+          setRoofType('');
+          setStructureType('');
+          setFinishType('');
+          setMaterial('');
+          setColor('');
+          setSubOption('');
+          
+          // Reset media files
+          setImages([]);
+          setDrawings([]);
+          setVideos([]);
+          
+          // Generate new customer ID
+          generateNewCustomerID();
+        }
       } else {
         throw new Error(result.message || 'Failed to submit form');
       }
@@ -329,12 +525,39 @@ export default function SiteVisitorForm() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 py-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-green-800 mb-2">
-            Wedabime Pramukayo
-          </h1>
-          <p className="text-xl text-blue-700 font-medium">
-            Site Visitor Application
-          </p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <div className="flex-1">
+              <h1 className="text-4xl md:text-5xl font-bold text-green-800 mb-2">
+                Wedabime Pramukayo
+              </h1>
+              <p className="text-xl text-blue-700 font-medium">
+                Site Visitor Application
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button asChild variant="outline" className="border-green-600 text-green-700 hover:bg-green-50">
+                <a href="/dashboard">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Dashboard
+                </a>
+              </Button>
+              {isEditing && (
+                <Button asChild variant="outline" onClick={() => window.location.href = '/'}>
+                  <a href="/">
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Entry
+                  </a>
+                </Button>
+              )}
+            </div>
+          </div>
+          {isEditing && (
+            <div className="bg-blue-100 border border-blue-300 rounded-lg p-4 inline-block">
+              <p className="text-blue-800 font-medium">
+                Editing Mode: Customer ID {customerId}
+              </p>
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -350,16 +573,14 @@ export default function SiteVisitorForm() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="customerId">Customer ID</Label>
-                  <Select value={customerId} onValueChange={setCustomerId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Customer ID" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {customerIds.slice(0, 100).map((id) => (
-                        <SelectItem key={id} value={id}>{id}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    id="customerId"
+                    value={customerId}
+                    readOnly
+                    className="bg-gray-100 font-mono"
+                    title="Customer ID is auto-generated and cannot be edited"
+                  />
+                  <p className="text-xs text-gray-500">Auto-generated - cannot be edited</p>
                 </div>
 
                 <div className="space-y-2">
@@ -1095,6 +1316,20 @@ export default function SiteVisitorForm() {
             </Card>
           )}
 
+          {/* Media Upload */}
+          <MediaUpload
+            images={images}
+            drawings={drawings}
+            videos={videos}
+            onImagesChange={setImages}
+            onDrawingsChange={setDrawings}
+            onVideosChange={setVideos}
+            maxImages={20}
+            maxDrawings={20}
+            maxVideos={3}
+            maxVideoDuration={60}
+          />
+
           {/* Additional Charges */}
           <Card className="border-orange-200 shadow-lg">
             <CardHeader className="bg-orange-100 border-b border-orange-200">
@@ -1197,12 +1432,12 @@ export default function SiteVisitorForm() {
               {isSubmitting ? (
                 <div className="flex items-center gap-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  Submitting...
+                  {isEditing ? 'Updating...' : 'Submitting...'}
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
-                  Submit Form
+                  {isEditing ? 'Update Form' : 'Submit Form'}
                 </div>
               )}
             </Button>
