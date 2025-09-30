@@ -67,12 +67,7 @@ export default function MediaUpload({
   }, [drawingMode, drawingCanvas]);
 
   // Camera functions
-  const startCamera = async (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.cancelBubble = true;
-    }
+  const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'environment' } 
@@ -87,12 +82,7 @@ export default function MediaUpload({
     }
   };
 
-  const stopCamera = (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.cancelBubble = true;
-    }
+  const stopCamera = () => {
     if (videoRef.current?.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
       stream.getTracks().forEach(track => track.stop());
@@ -101,12 +91,7 @@ export default function MediaUpload({
     }
   };
 
-  const capturePhoto = (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.cancelBubble = true;
-    }
+  const capturePhoto = () => {
     if (videoRef.current && canvasRef.current) {
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
@@ -131,12 +116,7 @@ export default function MediaUpload({
   };
 
   // Video recording functions
-  const startRecording = async (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.cancelBubble = true;
-    }
+  const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'environment' },
@@ -198,12 +178,7 @@ export default function MediaUpload({
     }
   };
 
-  const stopRecording = (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.cancelBubble = true;
-    }
+  const stopRecording = () => {
     if (mediaRecorderRef.current && recording) {
       mediaRecorderRef.current.stop();
       setRecording(false);
@@ -218,29 +193,16 @@ export default function MediaUpload({
   };
 
   // Drawing functions
-  const startDrawing = (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.cancelBubble = true;
-    }
+  const startDrawing = () => {
     setDrawingMode(true);
   };
 
-  const stopDrawing = (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.cancelBubble = true;
-    }
+  const stopDrawing = () => {
     setDrawingMode(false);
     setIsDrawing(false);
   };
 
   const handleDrawingStart = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    e.cancelBubble = true;
     if (!drawingContext || !drawingCanvas) return;
     
     setIsDrawing(true);
@@ -250,14 +212,9 @@ export default function MediaUpload({
     
     drawingContext.beginPath();
     drawingContext.moveTo(x, y);
-    
-    return false;
   };
 
   const handleDrawingMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    e.cancelBubble = true;
     if (!isDrawing || !drawingContext || !drawingCanvas) return;
     
     const rect = drawingCanvas.getBoundingClientRect();
@@ -266,27 +223,15 @@ export default function MediaUpload({
     
     drawingContext.lineTo(x, y);
     drawingContext.stroke();
-    
-    return false;
   };
 
   const handleDrawingEnd = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    e.cancelBubble = true;
     if (!drawingContext) return;
     drawingContext.closePath();
     setIsDrawing(false);
-    
-    return false;
   };
 
-  const saveDrawing = (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.cancelBubble = true;
-    }
+  const saveDrawing = () => {
     if (drawingCanvas) {
       const imageData = drawingCanvas.toDataURL('image/png');
       const newDrawing: MediaFile = {
@@ -306,23 +251,13 @@ export default function MediaUpload({
     }
   };
 
-  const clearDrawing = (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.cancelBubble = true;
-    }
+  const clearDrawing = () => {
     if (drawingContext && drawingCanvas) {
       drawingContext.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
     }
   };
 
-  const removeMedia = (type: 'image' | 'drawing' | 'video', id: string, e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.cancelBubble = true;
-    }
+  const removeMedia = (type: 'image' | 'drawing' | 'video', id: string) => {
     if (type === 'image') {
       onImagesChange(images.filter(img => img.id !== id));
     } else if (type === 'drawing') {
@@ -332,42 +267,82 @@ export default function MediaUpload({
     }
   };
 
-  const downloadMedia = (media: MediaFile, e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.cancelBubble = true;
-    }
+  const downloadMedia = (media: MediaFile) => {
     const link = document.createElement('a');
     link.href = media.data;
     link.download = media.name;
     link.click();
   };
 
+  // Wrapper functions to prevent form submission
+  const handleStartCamera = (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    startCamera();
+  };
+
+  const handleStopCamera = (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    stopCamera();
+  };
+
+  const handleCapturePhoto = (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    capturePhoto();
+  };
+
+  const handleStartRecording = (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    startRecording();
+  };
+
+  const handleStopRecording = (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    stopRecording();
+  };
+
+  const handleStartDrawing = (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    startDrawing();
+  };
+
+  const handleStopDrawing = (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    stopDrawing();
+  };
+
+  const handleSaveDrawing = (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    saveDrawing();
+  };
+
+  const handleClearDrawing = (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    clearDrawing();
+  };
+
+  const handleRemoveMedia = (type: 'image' | 'drawing' | 'video', id: string) => (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    removeMedia(type, id);
+  };
+
+  const handleDownloadMedia = (media: MediaFile) => (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    downloadMedia(media);
+  };
+
   return (
-    <div 
-      className="space-y-6" 
-      onMouseDown={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        e.cancelBubble = true;
-      }}
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        e.cancelBubble = true;
-      }}
-      onMouseUp={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        e.cancelBubble = true;
-      }}
-      onMouseMove={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        e.cancelBubble = true;
-      }}
-    >
+    <div className="space-y-6">
       {/* Camera Section */}
       <Card className="border-green-200 shadow-lg bg-white/80 backdrop-blur-sm">
         <CardHeader className="bg-gradient-to-r from-green-100 to-emerald-100 border-b border-green-200">
@@ -384,13 +359,9 @@ export default function MediaUpload({
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Camera Controls */}
-          <div className="flex flex-wrap gap-2" onMouseDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            e.cancelBubble = true;
-          }}>
+          <div className="flex flex-wrap gap-2">
             <Button
-              onClick={(e) => cameraActive ? stopCamera(e) : startCamera(e)}
+              onClick={cameraActive ? handleStopCamera : handleStartCamera}
               variant={cameraActive ? "destructive" : "default"}
               disabled={recording}
               type="button"
@@ -400,7 +371,7 @@ export default function MediaUpload({
             </Button>
             
             <Button
-              onClick={(e) => capturePhoto(e)}
+              onClick={handleCapturePhoto}
               disabled={!cameraActive || recording || images.length >= maxImages}
               variant="outline"
               type="button"
@@ -411,7 +382,7 @@ export default function MediaUpload({
             </Button>
             
             <Button
-              onClick={(e) => recording ? stopRecording(e) : startRecording(e)}
+              onClick={recording ? handleStopRecording : handleStartRecording}
               disabled={!cameraActive || videos.length >= maxVideos}
               variant={recording ? "destructive" : "outline"}
               type="button"
@@ -422,7 +393,7 @@ export default function MediaUpload({
             </Button>
             
             <Button
-              onClick={(e) => drawingMode ? stopDrawing(e) : startDrawing(e)}
+              onClick={drawingMode ? handleStopDrawing : handleStartDrawing}
               variant={drawingMode ? "destructive" : "outline"}
               disabled={drawings.length >= maxDrawings}
               type="button"
@@ -435,11 +406,7 @@ export default function MediaUpload({
 
           {/* Camera Preview */}
           {cameraActive && (
-            <div className="relative" onMouseDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              e.cancelBubble = true;
-            }}>
+            <div className="relative">
               <video
                 ref={videoRef}
                 autoPlay
@@ -457,11 +424,7 @@ export default function MediaUpload({
 
           {/* Drawing Canvas */}
           {drawingMode && (
-            <div className="space-y-2" onMouseDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              e.cancelBubble = true;
-            }}>
+            <div className="space-y-2">
               <canvas
                 ref={(canvas) => setDrawingCanvas(canvas)}
                 width={800}
@@ -473,8 +436,6 @@ export default function MediaUpload({
                 onMouseLeave={handleDrawingEnd}
                 onTouchStart={(e) => {
                   e.preventDefault();
-                  e.stopPropagation();
-                  e.cancelBubble = true;
                   const touch = e.touches[0];
                   const mouseEvent = new MouseEvent('mousedown', {
                     clientX: touch.clientX,
@@ -486,8 +447,6 @@ export default function MediaUpload({
                 }}
                 onTouchMove={(e) => {
                   e.preventDefault();
-                  e.stopPropagation();
-                  e.cancelBubble = true;
                   const touch = e.touches[0];
                   const mouseEvent = new MouseEvent('mousemove', {
                     clientX: touch.clientX,
@@ -499,8 +458,6 @@ export default function MediaUpload({
                 }}
                 onTouchEnd={(e) => {
                   e.preventDefault();
-                  e.stopPropagation();
-                  e.cancelBubble = true;
                   const mouseEvent = new MouseEvent('mouseup', {});
                   if (drawingCanvas) {
                     drawingCanvas.dispatchEvent(mouseEvent);
@@ -508,16 +465,12 @@ export default function MediaUpload({
                 }}
                 style={{ touchAction: 'none' }}
               />
-              <div className="flex gap-2" onMouseDown={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                e.cancelBubble = true;
-              }}>
-                <Button onClick={(e) => saveDrawing(e)} variant="outline" type="button" className="border-green-600 text-green-700 hover:bg-green-50">
+              <div className="flex gap-2">
+                <Button onClick={handleSaveDrawing} variant="outline" type="button" className="border-green-600 text-green-700 hover:bg-green-50">
                   <Plus className="h-4 w-4 mr-2" />
                   Save Drawing
                 </Button>
-                <Button onClick={(e) => clearDrawing(e)} variant="outline" type="button" className="border-red-600 text-red-700 hover:bg-red-50">
+                <Button onClick={handleClearDrawing} variant="outline" type="button" className="border-red-600 text-red-700 hover:bg-red-50">
                   <Trash2 className="h-4 w-4 mr-2" />
                   Clear
                 </Button>
@@ -555,7 +508,7 @@ export default function MediaUpload({
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={(e) => downloadMedia(image, e)}
+                      onClick={handleDownloadMedia(image)}
                       className="h-6 w-6 p-0 text-white hover:text-green-300"
                     >
                       <Download className="h-3 w-3" />
@@ -563,7 +516,7 @@ export default function MediaUpload({
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={(e) => removeMedia('image', image.id, e)}
+                      onClick={handleRemoveMedia('image', image.id)}
                       className="h-6 w-6 p-0 text-white hover:text-red-300"
                     >
                       <Trash2 className="h-3 w-3" />
@@ -599,7 +552,7 @@ export default function MediaUpload({
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={(e) => downloadMedia(drawing, e)}
+                      onClick={handleDownloadMedia(drawing)}
                       className="h-6 w-6 p-0 text-white hover:text-emerald-300"
                     >
                       <Download className="h-3 w-3" />
@@ -607,7 +560,7 @@ export default function MediaUpload({
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={(e) => removeMedia('drawing', drawing.id, e)}
+                      onClick={handleRemoveMedia('drawing', drawing.id)}
                       className="h-6 w-6 p-0 text-white hover:text-red-300"
                     >
                       <Trash2 className="h-3 w-3" />
@@ -667,7 +620,7 @@ export default function MediaUpload({
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={(e) => downloadMedia(video, e)}
+                      onClick={handleDownloadMedia(video)}
                       className="h-6 w-6 p-0 text-white hover:text-teal-300"
                     >
                       <Download className="h-3 w-3" />
@@ -675,7 +628,7 @@ export default function MediaUpload({
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={(e) => removeMedia('video', video.id, e)}
+                      onClick={handleRemoveMedia('video', video.id)}
                       className="h-6 w-6 p-0 text-white hover:text-red-300"
                     >
                       <Trash2 className="h-3 w-3" />
