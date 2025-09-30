@@ -68,7 +68,10 @@ export default function MediaUpload({
 
   // Camera functions
   const startCamera = async (e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'environment' } 
@@ -84,7 +87,10 @@ export default function MediaUpload({
   };
 
   const stopCamera = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (videoRef.current?.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
       stream.getTracks().forEach(track => track.stop());
@@ -94,7 +100,10 @@ export default function MediaUpload({
   };
 
   const capturePhoto = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (videoRef.current && canvasRef.current) {
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
@@ -120,7 +129,10 @@ export default function MediaUpload({
 
   // Video recording functions
   const startRecording = async (e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'environment' },
@@ -183,7 +195,10 @@ export default function MediaUpload({
   };
 
   const stopRecording = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (mediaRecorderRef.current && recording) {
       mediaRecorderRef.current.stop();
       setRecording(false);
@@ -199,18 +214,25 @@ export default function MediaUpload({
 
   // Drawing functions
   const startDrawing = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setDrawingMode(true);
   };
 
   const stopDrawing = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setDrawingMode(false);
     setIsDrawing(false);
   };
 
   const handleDrawingStart = (e: React.MouseEvent<HTMLCanvasElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!drawingContext || !drawingCanvas) return;
     
     setIsDrawing(true);
@@ -224,6 +246,7 @@ export default function MediaUpload({
 
   const handleDrawingMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!isDrawing || !drawingContext || !drawingCanvas) return;
     
     const rect = drawingCanvas.getBoundingClientRect();
@@ -236,13 +259,17 @@ export default function MediaUpload({
 
   const handleDrawingEnd = (e: React.MouseEvent<HTMLCanvasElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!drawingContext) return;
     drawingContext.closePath();
     setIsDrawing(false);
   };
 
   const saveDrawing = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (drawingCanvas) {
       const imageData = drawingCanvas.toDataURL('image/png');
       const newDrawing: MediaFile = {
@@ -263,14 +290,20 @@ export default function MediaUpload({
   };
 
   const clearDrawing = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (drawingContext && drawingCanvas) {
       drawingContext.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
     }
   };
 
   const removeMedia = (type: 'image' | 'drawing' | 'video', id: string, e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (type === 'image') {
       onImagesChange(images.filter(img => img.id !== id));
     } else if (type === 'drawing') {
@@ -281,7 +314,10 @@ export default function MediaUpload({
   };
 
   const downloadMedia = (media: MediaFile, e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     const link = document.createElement('a');
     link.href = media.data;
     link.download = media.name;
