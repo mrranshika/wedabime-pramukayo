@@ -12,8 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { CalendarDays, MapPin, Upload, DollarSign, Home, Users, FileText, Camera, Video, Phone, MessageCircle, Plus, Trash2, Calculator } from 'lucide-react';
+import { CalendarDays, MapPin, Upload, DollarSign, Home, Users, FileText, Camera, Video, Phone, MessageCircle, Plus, Trash2, Calculator, Locate } from 'lucide-react';
 import MediaUpload from '@/components/MediaUpload';
+import GoogleMap from '@/components/GoogleMap';
 
 interface CustomerData {
   customerId: string;
@@ -80,6 +81,10 @@ export default function SiteVisitorForm() {
   const [district, setDistrict] = useState<string>('');
   const [city, setCity] = useState<string>('');
   const [address, setAddress] = useState<string>('');
+  const [locationPermission, setLocationPermission] = useState<boolean>(false);
+  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [isLoadingLocation, setIsLoadingLocation] = useState<boolean>(false);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>({ lat: 7.8731, lng: 80.7718 }); // Default to Sri Lanka center
 
   // Additional Charges
   const [hasRemovals, setHasRemovals] = useState<boolean>(false);
@@ -330,6 +335,112 @@ export default function SiteVisitorForm() {
     const updatedAreas = [...areas];
     updatedAreas[index] = { ...updatedAreas[index], [field]: value };
     setAreas(updatedAreas);
+  };
+
+  // Location functions
+  const requestLocationPermission = async () => {
+    setIsLoadingLocation(true);
+    try {
+      if ('geolocation' in navigator) {
+        const permission = await navigator.permissions.query({ name: 'geolocation' });
+        
+        if (permission.state === 'granted' || permission.state === 'prompt') {
+          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 0
+            });
+          });
+          
+          const { latitude, longitude } = position.coords;
+          setCurrentLocation({ lat: latitude, lng: longitude });
+          setMapCenter({ lat: latitude, lng: longitude });
+          setLocationPermission(true);
+          
+          // Get district and city from coordinates
+          await getLocationFromCoordinates(latitude, longitude);
+          
+          toast({
+            title: "Location Detected",
+            description: "Your location has been detected successfully!",
+          });
+        } else {
+          toast({
+            title: "Location Permission Denied",
+            description: "Please enable location permission to auto-detect your location.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Geolocation Not Supported",
+          description: "Your browser doesn't support geolocation.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error getting location:', error);
+      toast({
+        title: "Location Error",
+        description: "Failed to get your location. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingLocation(false);
+    }
+  };
+
+  const getLocationFromCoordinates = async (lat: number, lng: number) => {
+    try {
+      // Use reverse geocoding to get district and city
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+      const data = await response.json();
+      
+      if (data && data.address) {
+        const address = data.address;
+        
+        // Extract district and city from the response
+        let detectedDistrict = '';
+        let detectedCity = '';
+        
+        // Try to find district in the address components
+        if (address.state_district || address.county || address.district) {
+          detectedDistrict = address.state_district || address.county || address.district;
+        }
+        
+        // Try to find city in the address components
+        if (address.city || address.town || address.village || address.suburb) {
+          detectedCity = address.city || address.town || address.village || address.suburb;
+        }
+        
+        // Set the detected values if found
+        if (detectedDistrict) {
+          setDistrict(detectedDistrict);
+        }
+        if (detectedCity) {
+          setCity(detectedCity);
+        }
+        
+        // Set address if available
+        if (data.display_name) {
+          setAddress(data.display_name);
+        }
+      }
+    } catch (error) {
+      console.error('Error getting location from coordinates:', error);
+      toast({
+        title: "Location Lookup Error",
+        description: "Failed to get district and city from your location.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleMapClick = (lat: number, lng: number) => {
+    setCurrentLocation({ lat, lng });
+    setMapCenter({ lat, lng });
+    getLocationFromCoordinates(lat, lng);
   };
 
   const getTotalArea = (): number => {
@@ -683,13 +794,55 @@ export default function SiteVisitorForm() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="district">Lead located District</Label>
-                  <Input
-                    id="district"
-                    value={district}
-                    onChange={(e) => setDistrict(e.target.value)}
-                    placeholder="Enter district"
-                    required
-                  />
+                  <div className="flex gap-2">
+                    <Select value={district} onValueChange={setDistrict} required>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select district" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Ampara">Ampara</SelectItem>
+                        <SelectItem value="Anuradhapura">Anuradhapura</SelectItem>
+                        <SelectItem value="Badulla">Badulla</SelectItem>
+                        <SelectItem value="Batticaloa">Batticaloa</SelectItem>
+                        <SelectItem value="Colombo">Colombo</SelectItem>
+                        <SelectItem value="Galle">Galle</SelectItem>
+                        <SelectItem value="Gampaha">Gampaha</SelectItem>
+                        <SelectItem value="Hambantota">Hambantota</SelectItem>
+                        <SelectItem value="Jaffna">Jaffna</SelectItem>
+                        <SelectItem value="Kalutara">Kalutara</SelectItem>
+                        <SelectItem value="Kandy">Kandy</SelectItem>
+                        <SelectItem value="Kegalle">Kegalle</SelectItem>
+                        <SelectItem value="Kilinochchi">Kilinochchi</SelectItem>
+                        <SelectItem value="Kurunegala">Kurunegala</SelectItem>
+                        <SelectItem value="Mannar">Mannar</SelectItem>
+                        <SelectItem value="Matale">Matale</SelectItem>
+                        <SelectItem value="Matara">Matara</SelectItem>
+                        <SelectItem value="Monaragala">Monaragala</SelectItem>
+                        <SelectItem value="Mullaitivu">Mullaitivu</SelectItem>
+                        <SelectItem value="Nuwara Eliya">Nuwara Eliya</SelectItem>
+                        <SelectItem value="Polonnaruwa">Polonnaruwa</SelectItem>
+                        <SelectItem value="Puttalam">Puttalam</SelectItem>
+                        <SelectItem value="Ratnapura">Ratnapura</SelectItem>
+                        <SelectItem value="Trincomalee">Trincomalee</SelectItem>
+                        <SelectItem value="Vavuniya">Vavuniya</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      type="button"
+                      onClick={requestLocationPermission}
+                      disabled={isLoadingLocation}
+                      variant="outline"
+                      size="icon"
+                      className="flex-shrink-0"
+                      title="Detect my location"
+                    >
+                      {isLoadingLocation ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                      ) : (
+                        <Locate className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -717,12 +870,25 @@ export default function SiteVisitorForm() {
 
               <div className="space-y-2">
                 <Label>Google Map Location</Label>
-                <Card className="border-dashed border-2 border-gray-300 bg-gray-50">
-                  <CardContent className="p-8 text-center">
-                    <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600">Google Maps integration will be implemented here</p>
-                  </CardContent>
-                </Card>
+                <div className="space-y-2">
+                  <GoogleMap
+                    center={mapCenter}
+                    marker={currentLocation}
+                    onMapClick={handleMapClick}
+                    zoom={15}
+                  />
+                  <p className="text-sm text-gray-600">
+                    Click on the map to set location, or use the location detection button above
+                  </p>
+                  {currentLocation && (
+                    <div className="flex items-center gap-2 text-sm text-green-600">
+                      <MapPin className="h-4 w-4" />
+                      <span>
+                        Selected: {currentLocation.lat.toFixed(6)}, {currentLocation.lng.toFixed(6)}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
