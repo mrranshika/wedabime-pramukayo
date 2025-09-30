@@ -1615,7 +1615,7 @@ export default function SiteVisitorForm() {
               ) : (
                 <div className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
-                  {isEditing ? 'Update Form' : 'Submit Form'}
+                  {isEditing ? 'Update Form' : 'OK Form'}
                 </div>
               )}
             </Button>
