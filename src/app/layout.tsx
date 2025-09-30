@@ -14,21 +14,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Z.ai Code Scaffold - AI-Powered Development",
-  description: "Modern Next.js scaffold optimized for AI-powered development with Z.ai. Built with TypeScript, Tailwind CSS, and shadcn/ui.",
-  keywords: ["Z.ai", "Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui", "AI development", "React"],
-  authors: [{ name: "Z.ai Team" }],
+  title: "Zip Cart Co Web Solutions - Professional Development",
+  description: "Modern Next.js scaffold optimized for professional web development with Zip Cart Co Web Solutions. Built with TypeScript, Tailwind CSS, and shadcn/ui.",
+  keywords: ["Zip Cart Co Web Solutions", "Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui", "professional development", "React"],
+  authors: [{ name: "Zip Cart Co Web Solutions Team" }],
   openGraph: {
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
-    url: "https://chat.z.ai",
-    siteName: "Z.ai",
+    title: "Zip Cart Co Web Solutions",
+    description: "Professional web development with modern React stack",
+    url: "https://www.zipcartco.site",
+    siteName: "Zip Cart Co Web Solutions",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
+    title: "Zip Cart Co Web Solutions",
+    description: "Professional web development with modern React stack",
   },
 };
 

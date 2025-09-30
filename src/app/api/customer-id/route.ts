@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { CustomerIDGenerator } from '@/lib/customer-id-generator';
 
 // Simulated database - in production, this would be replaced with actual database calls
-let usedCustomerIDs: string[] = [];
+let usedCustomerIDs: Set<string> = new Set();
 
 export async function GET() {
   try {
     // In production, you would fetch used IDs from your database
     // For now, we'll return the next available ID
-    const nextID = CustomerIDGenerator.generateNextID(usedCustomerIDs);
+    const usedIDsArray = Array.from(usedCustomerIDs);
+    const nextID = CustomerIDGenerator.generateNextID(usedIDsArray);
     
     return NextResponse.json({ 
       success: true, 
@@ -39,14 +40,14 @@ export async function POST(request: NextRequest) {
         }, { status: 400 });
       }
       
-      if (usedCustomerIDs.includes(customerId)) {
+      if (usedCustomerIDs.has(customerId)) {
         return NextResponse.json({ 
           success: false, 
           message: 'Customer ID already in use'
         }, { status: 400 });
       }
       
-      usedCustomerIDs.push(customerId);
+      usedCustomerIDs.add(customerId);
       
       return NextResponse.json({ 
         success: true, 
@@ -57,12 +58,23 @@ export async function POST(request: NextRequest) {
     
     if (action === 'release') {
       // Release a customer ID (for editing/deleting entries)
-      usedCustomerIDs = usedCustomerIDs.filter(id => id !== customerId);
+      usedCustomerIDs.delete(customerId);
       
       return NextResponse.json({ 
         success: true, 
         message: 'Customer ID released successfully',
         customerId
+      });
+    }
+    
+    if (action === 'preview') {
+      // Generate preview IDs
+      const previewIDs = CustomerIDGenerator.generatePreviewIDs(10);
+      
+      return NextResponse.json({ 
+        success: true, 
+        previewIDs,
+        message: 'Preview IDs generated successfully'
       });
     }
     

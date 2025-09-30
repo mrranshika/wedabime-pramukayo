@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { MapPin } from 'lucide-react';
+import { MapPin, Leaf, TreePine } from 'lucide-react';
 
 interface GoogleMapProps {
   center: { lat: number; lng: number };
@@ -67,12 +67,38 @@ export default function GoogleMap({ center, onMapClick, marker, zoom = 15 }: Goo
               featureType: 'poi',
               elementType: 'labels',
               stylers: [{ visibility: 'off' }]
+            },
+            {
+              featureType: 'landscape',
+              elementType: 'geometry',
+              stylers: [{ color: '#f0f9ff' }]
+            },
+            {
+              featureType: 'water',
+              elementType: 'geometry',
+              stylers: [{ color: '#e0f2fe' }]
+            },
+            {
+              featureType: 'road',
+              elementType: 'geometry',
+              stylers: [{ color: '#ffffff' }]
+            },
+            {
+              featureType: 'road',
+              elementType: 'geometry.stroke',
+              stylers: [{ color: '#e5e7eb' }]
+            },
+            {
+              featureType: 'administrative',
+              elementType: 'geometry',
+              stylers: [{ color: '#fef3c7' }]
             }
           ],
           mapTypeControl: true,
           streetViewControl: true,
           fullscreenControl: true,
-          zoomControl: true
+          zoomControl: true,
+          backgroundColor: '#f0f9ff'
         };
 
         mapInstanceRef.current = new google.maps.Map(mapRef.current, mapOptions);
@@ -102,12 +128,23 @@ export default function GoogleMap({ center, onMapClick, marker, zoom = 15 }: Goo
         markerRef.current.setMap(null);
       }
 
+      // Custom green marker icon
+      const markerIcon = {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 8,
+        fillColor: '#059669',
+        fillOpacity: 1,
+        strokeColor: '#ffffff',
+        strokeWeight: 2,
+      };
+
       markerRef.current = new google.maps.Marker({
         position: position,
         map: mapInstanceRef.current,
         title: 'Selected Location',
         animation: google.maps.Animation.DROP,
-        draggable: true
+        draggable: true,
+        icon: markerIcon
       });
 
       // Add drag event listener
@@ -147,10 +184,10 @@ export default function GoogleMap({ center, onMapClick, marker, zoom = 15 }: Goo
 
   if (isLoading) {
     return (
-      <div className="w-full h-96 rounded-lg border border-gray-300 bg-gray-100 flex items-center justify-center">
+      <div className="w-full h-96 rounded-xl border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center shadow-lg">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading map...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-green-700 font-medium">Loading map...</p>
         </div>
       </div>
     );
@@ -158,11 +195,14 @@ export default function GoogleMap({ center, onMapClick, marker, zoom = 15 }: Goo
 
   if (error) {
     return (
-      <div className="w-full h-96 rounded-lg border border-gray-300 bg-gray-100 flex items-center justify-center">
+      <div className="w-full h-96 rounded-xl border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center shadow-lg">
         <div className="text-center">
-          <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 mb-4">{error}</p>
-          <p className="text-sm text-gray-500">Map functionality may be limited</p>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Leaf className="h-12 w-12 text-green-600" />
+            <TreePine className="h-12 w-12 text-emerald-600" />
+          </div>
+          <p className="text-green-700 font-medium mb-2">{error}</p>
+          <p className="text-sm text-green-600">Map functionality may be limited</p>
         </div>
       </div>
     );
@@ -171,8 +211,11 @@ export default function GoogleMap({ center, onMapClick, marker, zoom = 15 }: Goo
   return (
     <div 
       ref={mapRef} 
-      className="w-full h-96 rounded-lg border border-gray-300"
-      style={{ minHeight: '24rem' }}
+      className="w-full h-96 rounded-xl border-2 border-green-200 shadow-lg overflow-hidden"
+      style={{ 
+        minHeight: '24rem',
+        background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)'
+      }}
     />
   );
 }

@@ -1,86 +1,48 @@
-// Customer ID Generator Utility
+// Optimized Customer ID Generator Utility
 export class CustomerIDGenerator {
   private static letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   
-  // Generate all possible customer IDs in the format A-000a01 to ZZZZ-999z99
-  static generateAllIDs(): string[] {
-    const ids: string[] = [];
+  // Generate customer IDs on demand instead of all at once
+  static generateNextID(usedIDs: string[]): string {
+    // Start with simple single-letter prefixes for better performance
+    const prefixes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
     
-    // Single letter prefix (A-Z)
-    for (let prefix of this.letters) {
+    for (const prefix of prefixes) {
       for (let num = 0; num <= 999; num++) {
-        for (let letter of this.letters) {
+        for (const letter of this.letters.slice(0, 10)) { // A-J only for performance
           for (let suffix = 1; suffix <= 99; suffix++) {
             const numStr = num.toString().padStart(3, '0');
             const suffixStr = suffix.toString().padStart(2, '0');
-            ids.push(`${prefix}-${numStr}${letter}${suffixStr}`);
-          }
-        }
-      }
-    }
-    
-    // Double letter prefix (AA-ZZ)
-    for (let firstLetter of this.letters) {
-      for (let secondLetter of this.letters) {
-        const prefix = firstLetter + secondLetter;
-        for (let num = 0; num <= 999; num++) {
-          for (let letter of this.letters) {
-            for (let suffix = 1; suffix <= 99; suffix++) {
-              const numStr = num.toString().padStart(3, '0');
-              const suffixStr = suffix.toString().padStart(2, '0');
-              ids.push(`${prefix}-${numStr}${letter}${suffixStr}`);
+            const id = `${prefix}-${numStr}${letter}${suffixStr}`;
+            
+            if (!usedIDs.includes(id)) {
+              return id;
             }
           }
         }
       }
     }
     
-    // Triple letter prefix (AAA-ZZZ)
-    for (let firstLetter of this.letters) {
-      for (let secondLetter of this.letters) {
-        for (let thirdLetter of this.letters) {
-          const prefix = firstLetter + secondLetter + thirdLetter;
-          for (let num = 0; num <= 999; num++) {
-            for (let letter of this.letters) {
-              for (let suffix = 1; suffix <= 99; suffix++) {
-                const numStr = num.toString().padStart(3, '0');
-                const suffixStr = suffix.toString().padStart(2, '0');
-                ids.push(`${prefix}-${numStr}${letter}${suffixStr}`);
-              }
+    // If single-letter IDs are exhausted, try double-letter prefixes
+    const doublePrefixes = ['AA', 'AB', 'AC', 'AD', 'AE'];
+    for (const prefix of doublePrefixes) {
+      for (let num = 0; num <= 999; num++) {
+        for (const letter of this.letters.slice(0, 10)) { // A-J only for performance
+          for (let suffix = 1; suffix <= 99; suffix++) {
+            const numStr = num.toString().padStart(3, '0');
+            const suffixStr = suffix.toString().padStart(2, '0');
+            const id = `${prefix}-${numStr}${letter}${suffixStr}`;
+            
+            if (!usedIDs.includes(id)) {
+              return id;
             }
           }
         }
       }
     }
     
-    // Four letter prefix (AAAA-ZZZZ)
-    for (let firstLetter of this.letters) {
-      for (let secondLetter of this.letters) {
-        for (let thirdLetter of this.letters) {
-          for (let fourthLetter of this.letters) {
-            const prefix = firstLetter + secondLetter + thirdLetter + fourthLetter;
-            for (let num = 0; num <= 999; num++) {
-              for (let letter of this.letters) {
-                for (let suffix = 1; suffix <= 99; suffix++) {
-                  const numStr = num.toString().padStart(3, '0');
-                  const suffixStr = suffix.toString().padStart(2, '0');
-                  ids.push(`${prefix}-${numStr}${letter}${suffixStr}`);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    
-    return ids;
-  }
-  
-  // Generate next available customer ID
-  static generateNextID(usedIDs: string[]): string {
-    const allIDs = this.generateAllIDs();
-    const availableIDs = allIDs.filter(id => !usedIDs.includes(id));
-    return availableIDs[0] || 'ZZZZ-999z99'; // Fallback if all IDs are used
+    // Fallback if all IDs are used (shouldn't happen in practice)
+    return 'ZZZ-999z99';
   }
   
   // Validate customer ID format
@@ -138,5 +100,25 @@ export class CustomerIDGenerator {
     
     // Compare suffix
     return parsed1.suffix - parsed2.suffix;
+  }
+  
+  // Generate a batch of IDs for preview (limited to prevent memory issues)
+  static generatePreviewIDs(count: number = 10): string[] {
+    const ids: string[] = [];
+    const prefixes = ['A', 'B', 'C'];
+    
+    for (const prefix of prefixes) {
+      for (let num = 0; num <= 5 && ids.length < count; num++) {
+        for (const letter of this.letters.slice(0, 5)) {
+          for (let suffix = 1; suffix <= 5 && ids.length < count; suffix++) {
+            const numStr = num.toString().padStart(3, '0');
+            const suffixStr = suffix.toString().padStart(2, '0');
+            ids.push(`${prefix}-${numStr}${letter}${suffixStr}`);
+          }
+        }
+      }
+    }
+    
+    return ids.slice(0, count);
   }
 }

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Camera, Video, Trash2, Download, Plus, Edit, Eye } from 'lucide-react';
+import { Camera, Video, Trash2, Download, Plus, Edit, Eye, Leaf, TreePine, Sprout } from 'lucide-react';
 
 interface MediaFile {
   id: string;
@@ -60,7 +60,7 @@ export default function MediaUpload({
       if (ctx) {
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
-        ctx.strokeStyle = '#000000';
+        ctx.strokeStyle = '#059669'; // Green color for drawing
         setDrawingContext(ctx);
       }
     }
@@ -71,6 +71,7 @@ export default function MediaUpload({
     if (e) {
       e.preventDefault();
       e.stopPropagation();
+      e.cancelBubble = true;
     }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -90,6 +91,7 @@ export default function MediaUpload({
     if (e) {
       e.preventDefault();
       e.stopPropagation();
+      e.cancelBubble = true;
     }
     if (videoRef.current?.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
@@ -103,6 +105,7 @@ export default function MediaUpload({
     if (e) {
       e.preventDefault();
       e.stopPropagation();
+      e.cancelBubble = true;
     }
     if (videoRef.current && canvasRef.current) {
       const canvas = canvasRef.current;
@@ -132,6 +135,7 @@ export default function MediaUpload({
     if (e) {
       e.preventDefault();
       e.stopPropagation();
+      e.cancelBubble = true;
     }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -198,6 +202,7 @@ export default function MediaUpload({
     if (e) {
       e.preventDefault();
       e.stopPropagation();
+      e.cancelBubble = true;
     }
     if (mediaRecorderRef.current && recording) {
       mediaRecorderRef.current.stop();
@@ -217,6 +222,7 @@ export default function MediaUpload({
     if (e) {
       e.preventDefault();
       e.stopPropagation();
+      e.cancelBubble = true;
     }
     setDrawingMode(true);
   };
@@ -225,6 +231,7 @@ export default function MediaUpload({
     if (e) {
       e.preventDefault();
       e.stopPropagation();
+      e.cancelBubble = true;
     }
     setDrawingMode(false);
     setIsDrawing(false);
@@ -278,6 +285,7 @@ export default function MediaUpload({
     if (e) {
       e.preventDefault();
       e.stopPropagation();
+      e.cancelBubble = true;
     }
     if (drawingCanvas) {
       const imageData = drawingCanvas.toDataURL('image/png');
@@ -302,6 +310,7 @@ export default function MediaUpload({
     if (e) {
       e.preventDefault();
       e.stopPropagation();
+      e.cancelBubble = true;
     }
     if (drawingContext && drawingCanvas) {
       drawingContext.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
@@ -312,6 +321,7 @@ export default function MediaUpload({
     if (e) {
       e.preventDefault();
       e.stopPropagation();
+      e.cancelBubble = true;
     }
     if (type === 'image') {
       onImagesChange(images.filter(img => img.id !== id));
@@ -326,6 +336,7 @@ export default function MediaUpload({
     if (e) {
       e.preventDefault();
       e.stopPropagation();
+      e.cancelBubble = true;
     }
     const link = document.createElement('a');
     link.href = media.data;
@@ -339,39 +350,51 @@ export default function MediaUpload({
       onMouseDown={(e) => {
         e.preventDefault();
         e.stopPropagation();
+        e.cancelBubble = true;
       }}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
+        e.cancelBubble = true;
       }}
       onMouseUp={(e) => {
         e.preventDefault();
         e.stopPropagation();
+        e.cancelBubble = true;
       }}
       onMouseMove={(e) => {
         e.preventDefault();
         e.stopPropagation();
+        e.cancelBubble = true;
       }}
     >
       {/* Camera Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Camera className="h-5 w-5" />
+      <Card className="border-green-200 shadow-lg bg-white/80 backdrop-blur-sm">
+        <CardHeader className="bg-gradient-to-r from-green-100 to-emerald-100 border-b border-green-200">
+          <CardTitle className="flex items-center gap-2 text-green-800">
+            <div className="flex items-center gap-2">
+              <Leaf className="h-5 w-5 text-green-600" />
+              <Camera className="h-5 w-5" />
+            </div>
             Camera & Media
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-green-700">
             Capture photos, record videos, and create drawings for site documentation
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Camera Controls */}
-          <div className="flex flex-wrap gap-2" onMouseDown={(e) => e.preventDefault()}>
+          <div className="flex flex-wrap gap-2" onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            e.cancelBubble = true;
+          }}>
             <Button
               onClick={(e) => cameraActive ? stopCamera(e) : startCamera(e)}
               variant={cameraActive ? "destructive" : "default"}
               disabled={recording}
               type="button"
+              className={cameraActive ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700 text-white"}
             >
               {cameraActive ? "Stop Camera" : "Start Camera"}
             </Button>
@@ -381,6 +404,7 @@ export default function MediaUpload({
               disabled={!cameraActive || recording || images.length >= maxImages}
               variant="outline"
               type="button"
+              className="border-green-600 text-green-700 hover:bg-green-50 disabled:opacity-50"
             >
               <Camera className="h-4 w-4 mr-2" />
               Capture Photo ({images.length}/{maxImages})
@@ -391,6 +415,7 @@ export default function MediaUpload({
               disabled={!cameraActive || videos.length >= maxVideos}
               variant={recording ? "destructive" : "outline"}
               type="button"
+              className={recording ? "bg-red-600 hover:bg-red-700" : "border-green-600 text-green-700 hover:bg-green-50 disabled:opacity-50"}
             >
               <Video className="h-4 w-4 mr-2" />
               {recording ? `Stop Recording (${recordingTime}s)` : `Record Video (${videos.length}/${maxVideos})`}
@@ -401,6 +426,7 @@ export default function MediaUpload({
               variant={drawingMode ? "destructive" : "outline"}
               disabled={drawings.length >= maxDrawings}
               type="button"
+              className={drawingMode ? "bg-red-600 hover:bg-red-700" : "border-green-600 text-green-700 hover:bg-green-50 disabled:opacity-50"}
             >
               <Edit className="h-4 w-4 mr-2" />
               {drawingMode ? "Stop Drawing" : `Start Drawing (${drawings.length}/${maxDrawings})`}
@@ -409,16 +435,20 @@ export default function MediaUpload({
 
           {/* Camera Preview */}
           {cameraActive && (
-            <div className="relative" onMouseDown={(e) => e.preventDefault()}>
+            <div className="relative" onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              e.cancelBubble = true;
+            }}>
               <video
                 ref={videoRef}
                 autoPlay
                 playsInline
                 muted
-                className="w-full max-w-md rounded-lg border"
+                className="w-full max-w-md rounded-lg border-2 border-green-200 shadow-md"
               />
               {recording && (
-                <div className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-sm">
+                <div className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-sm animate-pulse">
                   REC {recordingTime}s
                 </div>
               )}
@@ -427,18 +457,24 @@ export default function MediaUpload({
 
           {/* Drawing Canvas */}
           {drawingMode && (
-            <div className="space-y-2" onMouseDown={(e) => e.preventDefault()}>
+            <div className="space-y-2" onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              e.cancelBubble = true;
+            }}>
               <canvas
                 ref={(canvas) => setDrawingCanvas(canvas)}
                 width={800}
                 height={600}
-                className="border rounded-lg cursor-crosshair max-w-full"
+                className="border-2 border-green-200 rounded-lg cursor-crosshair max-w-full bg-white shadow-md"
                 onMouseDown={handleDrawingStart}
                 onMouseMove={handleDrawingMove}
                 onMouseUp={handleDrawingEnd}
                 onMouseLeave={handleDrawingEnd}
                 onTouchStart={(e) => {
                   e.preventDefault();
+                  e.stopPropagation();
+                  e.cancelBubble = true;
                   const touch = e.touches[0];
                   const mouseEvent = new MouseEvent('mousedown', {
                     clientX: touch.clientX,
@@ -450,6 +486,8 @@ export default function MediaUpload({
                 }}
                 onTouchMove={(e) => {
                   e.preventDefault();
+                  e.stopPropagation();
+                  e.cancelBubble = true;
                   const touch = e.touches[0];
                   const mouseEvent = new MouseEvent('mousemove', {
                     clientX: touch.clientX,
@@ -461,6 +499,8 @@ export default function MediaUpload({
                 }}
                 onTouchEnd={(e) => {
                   e.preventDefault();
+                  e.stopPropagation();
+                  e.cancelBubble = true;
                   const mouseEvent = new MouseEvent('mouseup', {});
                   if (drawingCanvas) {
                     drawingCanvas.dispatchEvent(mouseEvent);
@@ -468,12 +508,16 @@ export default function MediaUpload({
                 }}
                 style={{ touchAction: 'none' }}
               />
-              <div className="flex gap-2" onMouseDown={(e) => e.preventDefault()}>
-                <Button onClick={(e) => saveDrawing(e)} variant="outline" type="button">
+              <div className="flex gap-2" onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.cancelBubble = true;
+              }}>
+                <Button onClick={(e) => saveDrawing(e)} variant="outline" type="button" className="border-green-600 text-green-700 hover:bg-green-50">
                   <Plus className="h-4 w-4 mr-2" />
                   Save Drawing
                 </Button>
-                <Button onClick={(e) => clearDrawing(e)} variant="outline" type="button">
+                <Button onClick={(e) => clearDrawing(e)} variant="outline" type="button" className="border-red-600 text-red-700 hover:bg-red-50">
                   <Trash2 className="h-4 w-4 mr-2" />
                   Clear
                 </Button>
@@ -488,29 +532,31 @@ export default function MediaUpload({
       {/* Media Galleries */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Images Gallery */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Photos ({images.length}/{maxImages})</span>
-              <Badge variant="secondary">{images.length}</Badge>
+        <Card className="border-green-200 shadow-lg bg-white/80 backdrop-blur-sm">
+          <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-200">
+            <CardTitle className="flex items-center justify-between text-green-800">
+              <div className="flex items-center gap-2">
+                <Leaf className="h-4 w-4 text-green-600" />
+                Photos
+              </div>
+              <Badge variant="secondary" className="bg-green-100 text-green-800">{images.length}/{maxImages}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 max-h-96 overflow-y-auto">
               {images.map((image) => (
                 <div key={image.id} className="relative group">
                   <img
                     src={image.data}
                     alt={image.name}
-                    className="w-full h-20 object-cover rounded border"
+                    className="w-full h-20 object-cover rounded border-2 border-green-200"
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center gap-1">
                     <Button
                       size="sm"
                       variant="ghost"
                       onClick={(e) => downloadMedia(image, e)}
-                      className="h-6 w-6 p-0"
-                      type="button"
+                      className="h-6 w-6 p-0 text-white hover:text-green-300"
                     >
                       <Download className="h-3 w-3" />
                     </Button>
@@ -518,47 +564,43 @@ export default function MediaUpload({
                       size="sm"
                       variant="ghost"
                       onClick={(e) => removeMedia('image', image.id, e)}
-                      className="h-6 w-6 p-0"
-                      type="button"
+                      className="h-6 w-6 p-0 text-white hover:text-red-300"
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
               ))}
-              {images.length === 0 && (
-                <div className="col-span-2 text-center text-gray-500 py-4">
-                  No photos captured
-                </div>
-              )}
             </div>
           </CardContent>
         </Card>
 
         {/* Drawings Gallery */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Drawings ({drawings.length}/{maxDrawings})</span>
-              <Badge variant="secondary">{drawings.length}</Badge>
+        <Card className="border-emerald-200 shadow-lg bg-white/80 backdrop-blur-sm">
+          <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-200">
+            <CardTitle className="flex items-center justify-between text-emerald-800">
+              <div className="flex items-center gap-2">
+                <TreePine className="h-4 w-4 text-emerald-600" />
+                Drawings
+              </div>
+              <Badge variant="secondary" className="bg-emerald-100 text-emerald-800">{drawings.length}/{maxDrawings}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 max-h-96 overflow-y-auto">
               {drawings.map((drawing) => (
                 <div key={drawing.id} className="relative group">
                   <img
                     src={drawing.data}
                     alt={drawing.name}
-                    className="w-full h-20 object-cover rounded border"
+                    className="w-full h-20 object-cover rounded border-2 border-emerald-200"
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center gap-1">
                     <Button
                       size="sm"
                       variant="ghost"
                       onClick={(e) => downloadMedia(drawing, e)}
-                      className="h-6 w-6 p-0"
-                      type="button"
+                      className="h-6 w-6 p-0 text-white hover:text-emerald-300"
                     >
                       <Download className="h-3 w-3" />
                     </Button>
@@ -566,55 +608,59 @@ export default function MediaUpload({
                       size="sm"
                       variant="ghost"
                       onClick={(e) => removeMedia('drawing', drawing.id, e)}
-                      className="h-6 w-6 p-0"
-                      type="button"
+                      className="h-6 w-6 p-0 text-white hover:text-red-300"
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
               ))}
-              {drawings.length === 0 && (
-                <div className="col-span-2 text-center text-gray-500 py-4">
-                  No drawings created
-                </div>
-              )}
             </div>
           </CardContent>
         </Card>
 
         {/* Videos Gallery */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Videos ({videos.length}/{maxVideos})</span>
-              <Badge variant="secondary">{videos.length}</Badge>
+        <Card className="border-teal-200 shadow-lg bg-white/80 backdrop-blur-sm">
+          <CardHeader className="bg-gradient-to-r from-teal-50 to-cyan-50 border-b border-teal-200">
+            <CardTitle className="flex items-center justify-between text-teal-800">
+              <div className="flex items-center gap-2">
+                <Sprout className="h-4 w-4 text-teal-600" />
+                Videos
+              </div>
+              <Badge variant="secondary" className="bg-teal-100 text-teal-800">{videos.length}/{maxVideos}</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-96 overflow-y-auto">
               {videos.map((video) => (
                 <div key={video.id} className="relative group">
                   <video
                     src={video.data}
-                    className="w-full h-20 object-cover rounded border"
+                    className="w-full h-20 object-cover rounded border-2 border-teal-200"
                     muted
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center gap-1">
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 w-6 p-0 text-white hover:text-teal-300"
+                        >
                           <Eye className="h-3 w-3" />
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="max-w-2xl">
                         <DialogHeader>
-                          <DialogTitle>{video.name}</DialogTitle>
+                          <DialogTitle className="text-teal-800">Video Preview</DialogTitle>
+                          <DialogDescription className="text-teal-700">
+                            {video.name} - {new Date(video.timestamp).toLocaleString()}
+                          </DialogDescription>
                         </DialogHeader>
                         <video
                           src={video.data}
                           controls
-                          className="w-full max-h-96"
+                          className="w-full rounded-lg"
                         />
                       </DialogContent>
                     </Dialog>
@@ -622,8 +668,7 @@ export default function MediaUpload({
                       size="sm"
                       variant="ghost"
                       onClick={(e) => downloadMedia(video, e)}
-                      className="h-6 w-6 p-0"
-                      type="button"
+                      className="h-6 w-6 p-0 text-white hover:text-teal-300"
                     >
                       <Download className="h-3 w-3" />
                     </Button>
@@ -631,22 +676,16 @@ export default function MediaUpload({
                       size="sm"
                       variant="ghost"
                       onClick={(e) => removeMedia('video', video.id, e)}
-                      className="h-6 w-6 p-0"
-                      type="button"
+                      className="h-6 w-6 p-0 text-white hover:text-red-300"
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
                   <div className="absolute bottom-1 left-1 bg-black bg-opacity-70 text-white text-xs px-1 rounded">
-                    {video.size ? `${(video.size / 1024 / 1024).toFixed(1)}MB` : ''}
+                    {Math.round((video.size || 0) / 1024 / 1024 * 10) / 10}MB
                   </div>
                 </div>
               ))}
-              {videos.length === 0 && (
-                <div className="text-center text-gray-500 py-4">
-                  No videos recorded
-                </div>
-              )}
             </div>
           </CardContent>
         </Card>
