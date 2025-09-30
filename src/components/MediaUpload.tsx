@@ -233,6 +233,7 @@ export default function MediaUpload({
   const handleDrawingStart = (e: React.MouseEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    e.cancelBubble = true;
     if (!drawingContext || !drawingCanvas) return;
     
     setIsDrawing(true);
@@ -242,11 +243,14 @@ export default function MediaUpload({
     
     drawingContext.beginPath();
     drawingContext.moveTo(x, y);
+    
+    return false;
   };
 
   const handleDrawingMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    e.cancelBubble = true;
     if (!isDrawing || !drawingContext || !drawingCanvas) return;
     
     const rect = drawingCanvas.getBoundingClientRect();
@@ -255,14 +259,19 @@ export default function MediaUpload({
     
     drawingContext.lineTo(x, y);
     drawingContext.stroke();
+    
+    return false;
   };
 
   const handleDrawingEnd = (e: React.MouseEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    e.cancelBubble = true;
     if (!drawingContext) return;
     drawingContext.closePath();
     setIsDrawing(false);
+    
+    return false;
   };
 
   const saveDrawing = (e?: React.MouseEvent) => {
@@ -325,7 +334,25 @@ export default function MediaUpload({
   };
 
   return (
-    <div className="space-y-6">
+    <div 
+      className="space-y-6" 
+      onMouseDown={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseUp={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseMove={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+    >
       {/* Camera Section */}
       <Card>
         <CardHeader>
@@ -339,7 +366,7 @@ export default function MediaUpload({
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Camera Controls */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" onMouseDown={(e) => e.preventDefault()}>
             <Button
               onClick={(e) => cameraActive ? stopCamera(e) : startCamera(e)}
               variant={cameraActive ? "destructive" : "default"}
@@ -382,7 +409,7 @@ export default function MediaUpload({
 
           {/* Camera Preview */}
           {cameraActive && (
-            <div className="relative">
+            <div className="relative" onMouseDown={(e) => e.preventDefault()}>
               <video
                 ref={videoRef}
                 autoPlay
@@ -400,7 +427,7 @@ export default function MediaUpload({
 
           {/* Drawing Canvas */}
           {drawingMode && (
-            <div className="space-y-2">
+            <div className="space-y-2" onMouseDown={(e) => e.preventDefault()}>
               <canvas
                 ref={(canvas) => setDrawingCanvas(canvas)}
                 width={800}
@@ -410,9 +437,38 @@ export default function MediaUpload({
                 onMouseMove={handleDrawingMove}
                 onMouseUp={handleDrawingEnd}
                 onMouseLeave={handleDrawingEnd}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  const touch = e.touches[0];
+                  const mouseEvent = new MouseEvent('mousedown', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                  });
+                  if (drawingCanvas) {
+                    drawingCanvas.dispatchEvent(mouseEvent);
+                  }
+                }}
+                onTouchMove={(e) => {
+                  e.preventDefault();
+                  const touch = e.touches[0];
+                  const mouseEvent = new MouseEvent('mousemove', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                  });
+                  if (drawingCanvas) {
+                    drawingCanvas.dispatchEvent(mouseEvent);
+                  }
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  const mouseEvent = new MouseEvent('mouseup', {});
+                  if (drawingCanvas) {
+                    drawingCanvas.dispatchEvent(mouseEvent);
+                  }
+                }}
                 style={{ touchAction: 'none' }}
               />
-              <div className="flex gap-2">
+              <div className="flex gap-2" onMouseDown={(e) => e.preventDefault()}>
                 <Button onClick={(e) => saveDrawing(e)} variant="outline" type="button">
                   <Plus className="h-4 w-4 mr-2" />
                   Save Drawing
