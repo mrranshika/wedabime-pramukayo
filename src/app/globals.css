@@ -120,3 +120,208 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Mobile performance optimizations */
+.mobile-optimized {
+  /* Hardware acceleration for better performance */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  
+  /* Optimize for touch */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Reduced motion for better performance */
+.reduce-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Simplified UI for small screens */
+.simplified-ui {
+  /* Remove unnecessary visual effects */
+  box-shadow: none !important;
+  border-radius: 4px !important;
+  background: #ffffff !important;
+  
+  /* Simplify animations */
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Mobile-optimized image styles */
+.mobile-optimized-image {
+  /* Prevent layout shift */
+  display: block;
+  max-width: 100%;
+  height: auto;
+  
+  /* Smooth loading */
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.mobile-optimized-image.loaded {
+  opacity: 1;
+}
+
+/* Mobile-optimized button styles */
+.mobile-optimized-button {
+  /* Better touch targets */
+  min-height: 44px;
+  min-width: 44px;
+  padding: 12px 16px;
+  
+  /* Prevent double-tap zoom */
+  touch-action: manipulation;
+  
+  /* Visual feedback */
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-optimized-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.mobile-optimized-button:active::after {
+  width: 200px;
+  height: 200px;
+}
+
+/* Mobile-optimized input styles */
+.mobile-optimized-input {
+  /* Prevent zoom on focus */
+  font-size: 16px;
+  
+  /* Better touch targets */
+  min-height: 44px;
+  padding: 12px;
+  
+  /* Remove default styling */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  
+  /* Better focus styles */
+  outline: none;
+  box-shadow: none;
+}
+
+/* Loading placeholder styles */
+.mobile-optimized-placeholder {
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Performance optimizations for scroll containers */
+.mobile-scroll-container {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  overflow-y: auto;
+  
+  /* Hide scrollbars but keep functionality */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Card optimizations for mobile */
+.mobile-optimized-card {
+  /* Reduce visual complexity */
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  
+  /* Better touch targets */
+  padding: 16px;
+  margin: 8px 0;
+  
+  /* Prevent text selection */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* List optimizations for mobile */
+.mobile-optimized-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mobile-optimized-list li {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.mobile-optimized-list li:last-child {
+  border-bottom: none;
+}
+
+/* Form optimizations for mobile */
+.mobile-optimized-form {
+  /* Reduce visual noise */
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mobile-optimized-form .form-group {
+  margin-bottom: 16px;
+}
+
+.mobile-optimized-form label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Network-aware styles */
+@media (prefers-reduced-data: reduce) {
+  /* Reduce data usage */
+  .mobile-optimized-image {
+    content-visibility: auto;
+  }
+  
+  /* Disable animations */
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Battery saver mode optimizations */
+@media (prefers-reduced-motion: reduce) {
+  /* Reduce motion for battery saving */
+  .mobile-optimized {
+    animation: none !important;
+    transition: none !important;
+  }
+}

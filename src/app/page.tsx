@@ -15,6 +15,8 @@ import { useToast } from '@/hooks/use-toast';
 import { CalendarDays, MapPin, Upload, DollarSign, Home, Users, FileText, Camera, Video, Phone, MessageCircle, Plus, Trash2, Calculator, Locate, Leaf, TreePine, Sprout } from 'lucide-react';
 import MediaUpload from '@/components/MediaUpload';
 import GoogleMap from '@/components/GoogleMap';
+import MobileNavigation from '@/components/MobileNavigation';
+import MobileLoading, { MobileButtonLoading } from '@/components/MobileLoading';
 
 interface CustomerData {
   customerId: string;
@@ -609,46 +611,48 @@ export default function SiteVisitorForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-4 md:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-2 sm:p-3 md:p-4 lg:p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8 py-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div className="text-center mb-6 sm:mb-8 py-4 sm:py-6 md:py-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mb-4 md:mb-6">
             <div className="flex-1">
-              <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
-                <div className="flex items-center gap-2">
-                  <Leaf className="h-8 w-8 text-green-600" />
-                  <TreePine className="h-8 w-8 text-emerald-600" />
-                  <Sprout className="h-8 w-8 text-teal-600" />
+              <div className="flex items-center justify-center md:justify-start gap-2 md:gap-3 mb-3 md:mb-4">
+                <div className="flex items-center gap-1 md:gap-2">
+                  <Leaf className="h-6 w-6 md:h-8 md:w-8 text-green-600" />
+                  <TreePine className="h-6 w-6 md:h-8 md:w-8 text-emerald-600" />
+                  <Sprout className="h-6 w-6 md:h-8 md:w-8 text-teal-600" />
                 </div>
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-800 via-emerald-700 to-teal-800 bg-clip-text text-transparent mb-2">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-green-800 via-emerald-700 to-teal-800 bg-clip-text text-transparent mb-1 md:mb-2">
                 Wedabime Pramukayo
               </h1>
-              <p className="text-xl text-emerald-700 font-medium">
+              <p className="text-lg sm:text-xl text-emerald-700 font-medium">
                 Site Visitor Application
               </p>
             </div>
-            <div className="flex gap-2">
-              <Button asChild variant="outline" className="border-green-600 text-green-700 hover:bg-green-50 hover:text-green-800 transition-all">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button asChild variant="outline" className="border-green-600 text-green-700 hover:bg-green-50 hover:text-green-800 transition-all h-10 md:h-auto text-sm md:text-base">
                 <a href="/dashboard">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Dashboard
+                  <FileText className="h-4 w-4 mr-1 md:mr-2" />
+                  <span className="hidden sm:inline">Dashboard</span>
+                  <span className="sm:hidden">Dash</span>
                 </a>
               </Button>
               {isEditing && (
-                <Button asChild variant="outline" onClick={() => window.location.href = '/'} className="border-emerald-600 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 transition-all">
+                <Button asChild variant="outline" onClick={() => window.location.href = '/'} className="border-emerald-600 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 transition-all h-10 md:h-auto text-sm md:text-base">
                   <a href="/">
-                    <Plus className="h-4 w-4 mr-2" />
-                    New Entry
+                    <Plus className="h-4 w-4 mr-1 md:mr-2" />
+                    <span className="hidden sm:inline">New Entry</span>
+                    <span className="sm:hidden">New</span>
                   </a>
                 </Button>
               )}
             </div>
           </div>
           {isEditing && (
-            <div className="bg-emerald-100 border border-emerald-300 rounded-lg p-4 inline-block">
-              <p className="text-emerald-800 font-medium flex items-center gap-2">
+            <div className="bg-emerald-100 border border-emerald-300 rounded-lg p-3 md:p-4 inline-block">
+              <p className="text-emerald-800 font-medium flex items-center gap-2 text-sm md:text-base">
                 <FileText className="h-4 w-4" />
                 Editing Mode: Customer ID {customerId}
               </p>
@@ -656,38 +660,38 @@ export default function SiteVisitorForm() {
           )}
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
           {/* Customer Information */}
           <Card className="border-green-200 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardHeader className="bg-gradient-to-r from-green-100 to-emerald-100 border-b border-green-200">
-              <CardTitle className="flex items-center gap-2 text-green-800">
-                <Users className="h-6 w-6" />
+            <CardHeader className="bg-gradient-to-r from-green-100 to-emerald-100 border-b border-green-200 p-4 md:p-6">
+              <CardTitle className="flex items-center gap-2 text-green-800 text-lg md:text-xl">
+                <Users className="h-5 w-5 md:h-6 md:w-6" />
                 Customer Information
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CardContent className="p-4 md:p-6 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="customerId" className="text-green-700 font-medium">Customer ID</Label>
+                  <Label htmlFor="customerId" className="text-green-700 font-medium text-sm md:text-base">Customer ID</Label>
                   <Input
                     id="customerId"
                     value={customerId}
                     readOnly
-                    className="bg-green-50 border-green-200 font-mono text-green-800"
+                    className="bg-green-50 border-green-200 font-mono text-green-800 h-10 md:h-auto text-sm md:text-base"
                     title="Customer ID is auto-generated and cannot be edited"
                   />
                   <p className="text-xs text-green-600">Auto-generated - cannot be edited</p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="leadDate" className="text-green-700 font-medium">Date when the lead received</Label>
+                  <Label htmlFor="leadDate" className="text-green-700 font-medium text-sm md:text-base">Date when the lead received</Label>
                   <Input
                     id="leadDate"
                     type="date"
                     value={leadDate}
                     onChange={(e) => setLeadDate(e.target.value)}
                     required
-                    className="border-green-200 focus:border-green-400 focus:ring-green-400"
+                    className="border-green-200 focus:border-green-400 focus:ring-green-400 h-10 md:h-auto text-sm md:text-base"
                   />
                   {dayOfWeek && (
                     <p className="text-sm text-green-600 flex items-center gap-1">
@@ -698,21 +702,21 @@ export default function SiteVisitorForm() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="customerName" className="text-green-700 font-medium">Customer Name</Label>
+                  <Label htmlFor="customerName" className="text-green-700 font-medium text-sm md:text-base">Customer Name</Label>
                   <Input
                     id="customerName"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     placeholder="Enter customer name"
                     required
-                    className="border-green-200 focus:border-green-400 focus:ring-green-400"
+                    className="border-green-200 focus:border-green-400 focus:ring-green-400 h-10 md:h-auto text-sm md:text-base"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phoneNumber" className="text-green-700 font-medium">Phone Number</Label>
-                  <div className="flex gap-2 items-end">
-                    <div className="flex-1">
+                  <Label htmlFor="phoneNumber" className="text-green-700 font-medium text-sm md:text-base">Phone Number</Label>
+                  <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-end">
+                    <div className="flex-1 w-full">
                       <Input
                         id="phoneNumber"
                         type="tel"
@@ -720,17 +724,17 @@ export default function SiteVisitorForm() {
                         onChange={(e) => setPhoneNumber(e.target.value)}
                         placeholder="Enter phone number"
                         required
-                        className="border-green-200 focus:border-green-400 focus:ring-green-400"
+                        className="border-green-200 focus:border-green-400 focus:ring-green-400 h-10 md:h-auto text-sm md:text-base w-full"
                       />
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 mt-2 sm:mt-0">
                       <Checkbox
                         id="hasWhatsApp"
                         checked={hasWhatsApp}
                         onCheckedChange={(checked) => setHasWhatsApp(checked as boolean)}
-                        className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                        className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 h-5 w-5"
                       />
-                      <Label htmlFor="hasWhatsApp" className="flex items-center gap-1 text-green-700">
+                      <Label htmlFor="hasWhatsApp" className="flex items-center gap-1 text-green-700 text-sm md:text-base">
                         <MessageCircle className="h-4 w-4 text-green-600" />
                         WhatsApp
                       </Label>
@@ -741,24 +745,24 @@ export default function SiteVisitorForm() {
 
               {!hasWhatsApp && (
                 <Card className="bg-green-50 border-green-200">
-                  <CardContent className="p-4 space-y-4">
+                  <CardContent className="p-3 md:p-4 space-y-3 md:space-y-4">
                     <div className="space-y-2">
-                      <Label className="text-green-700 font-medium">Do you have a WhatsApp number?</Label>
-                      <RadioGroup value={hasWhatsAppNumber} onValueChange={setHasWhatsAppNumber}>
+                      <Label className="text-green-700 font-medium text-sm md:text-base">Do you have a WhatsApp number?</Label>
+                      <RadioGroup value={hasWhatsAppNumber} onValueChange={setHasWhatsAppNumber} className="space-y-2">
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="yes" id="whatsappYes" className="text-green-600" />
-                          <Label htmlFor="whatsappYes" className="text-green-700">Yes</Label>
+                          <RadioGroupItem value="yes" id="whatsappYes" className="text-green-600 h-4 w-4" />
+                          <Label htmlFor="whatsappYes" className="text-green-700 text-sm md:text-base">Yes</Label>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="no" id="whatsappNo" className="text-green-600" />
-                          <Label htmlFor="whatsappNo" className="text-green-700">No</Label>
+                          <RadioGroupItem value="no" id="whatsappNo" className="text-green-600 h-4 w-4" />
+                          <Label htmlFor="whatsappNo" className="text-green-700 text-sm md:text-base">No</Label>
                         </div>
                       </RadioGroup>
                     </div>
 
                     {hasWhatsAppNumber === 'yes' && (
                       <div className="space-y-2">
-                        <Label htmlFor="whatsappNumber" className="text-green-700 font-medium">WhatsApp Number</Label>
+                        <Label htmlFor="whatsappNumber" className="text-green-700 font-medium text-sm md:text-base">WhatsApp Number</Label>
                         <Input
                           id="whatsappNumber"
                           type="tel"
@@ -1601,27 +1605,21 @@ export default function SiteVisitorForm() {
 
           {/* Submit Button */}
           <div className="text-center">
-            <Button
-              type="submit"
-              size="lg"
-              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-200"
-              disabled={isSubmitting}
+            <MobileButtonLoading
+              isLoading={isSubmitting}
+              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 sm:px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-200 h-12 sm:h-auto text-sm sm:text-base"
             >
-              {isSubmitting ? (
-                <div className="flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  {isEditing ? 'Updating...' : 'Submitting...'}
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  {isEditing ? 'Update Form' : 'OK Form'}
-                </div>
-              )}
-            </Button>
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
+                {isEditing ? 'Update Form' : 'Submit Form'}
+              </div>
+            </MobileButtonLoading>
           </div>
         </form>
       </div>
+      
+      {/* Mobile Navigation */}
+      <MobileNavigation currentPath="/" />
     </div>
   );
 }
